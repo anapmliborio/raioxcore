@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Raio-X CORE — Diagnóstico de Performance Clínica</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #F5F1EB;
+    --bg-card: #FFFFFF;
+    --bg-soft: #FAF7F3;
+    --accent: #B5541F;
+    --accent-dark: #8F3F12;
+    --accent-light: #FFF3EC;
+    --accent-border: #F0D0BC;
+    --text-primary: #1A1410;
+    --text-body: #5C5149;
+    --text-muted: #9A8E84;
+    --text-hint: #C4BAB0;
+    --border: #E4DDD5;
+    --border-strong: #CFC6BB;
+    --serif: 'Playfair Display', Georgia, serif;
+    --sans: 'DM Sans', system-ui, sans-serif;
+  }
+
+  html { font-size: 16px; scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    font-family: var(--sans);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 40px 20px 80px;
+  }
+
+  /* LOGO */
+  .logo-bar {
+    width: 100%;
+    max-width: 640px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 32px;
+  }
+  .logo-text {
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .logo-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  /* CARD PRINCIPAL */
+  .card {
+    width: 100%;
+    max-width: 640px;
+    background: var(--bg-card);
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    box-shadow: 0 2px 24px rgba(90,65,48,0.06);
+  }
+
+  /* HEADER DO CARD */
+  .card-header {
+    padding: 40px 48px 32px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-soft);
+  }
+  .header-eyebrow {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 14px;
+  }
+  .header-title {
+    font-family: var(--serif);
+    font-size: 28px;
+    font-weight: 400;
+    color: var(--text-primary);
+    line-height: 1.25;
+    margin-bottom: 6px;
+  }
+  .header-subtitle {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 300;
+  }
+
+  /* PROGRESS */
+  .progress-section {
+    padding: 20px 48px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-card);
+  }
+  .progress-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .progress-bar {
+    flex: 1;
+    height: 3px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 3px;
+    transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+  }
+  .progress-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+    font-weight: 400;
+  }
+
+  /* BODY */
+  .card-body { padding: 40px 48px; }
+
+  /* TELA ABERTURA */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  .opening-text {
+    font-size: 15px;
+    color: var(--text-body);
+    line-height: 1.85;
+    margin-bottom: 28px;
+  }
+  .opening-text strong {
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+  .instr-block {
+    padding: 20px 22px;
+    border-left: 2.5px solid var(--accent);
+    background: var(--accent-light);
+    border-radius: 0 12px 12px 0;
+    margin-bottom: 36px;
+  }
+  .instr-block p {
+    font-size: 14px;
+    color: var(--text-body);
+    line-height: 1.75;
+  }
+  .instr-block strong { color: var(--accent); font-weight: 500; }
+
+  /* CAMPOS DADOS */
+  .fields { margin-bottom: 36px; }
+  .field-group { margin-bottom: 16px; }
+  .field-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 7px;
+  }
+  .field-input {
+    width: 100%;
+    padding: 13px 16px;
+    border: 1px solid var(--border-strong);
+    border-radius: 10px;
+    font-family: var(--sans);
+    font-size: 15px;
+    color: var(--text-primary);
+    background: var(--bg-soft);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .field-input:focus {
+    border-color: var(--accent);
+    background: #fff;
+  }
+  .field-input::placeholder { color: var(--text-hint); }
+
+  /* PILARES */
+  .pilar-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-light);
+    border: 1px solid var(--accent-border);
+    padding: 5px 13px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+  }
+  .pilar-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  /* PERGUNTA */
+  .question-text {
+    font-family: var(--serif);
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--text-primary);
+    line-height: 1.55;
+    margin-bottom: 28px;
+  }
+  .question-hint {
+    font-size: 12px;
+    color: var(--text-hint);
+    font-style: italic;
+    margin-top: -16px;
+    margin-bottom: 24px;
+  }
+
+  /* OPÇÕES */
+  .options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 36px; }
+  .option {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 15px 18px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    background: var(--bg-soft);
+    transition: border-color 0.15s, background 0.15s, transform 0.1s;
+    user-select: none;
+  }
+  .option:hover {
+    border-color: var(--accent-border);
+    background: var(--accent-light);
+  }
+  .option.selected {
+    border-color: var(--accent);
+    background: var(--accent-light);
+  }
+  .option:active { transform: scale(0.995); }
+  .opt-letter {
+    width: 27px; height: 27px;
+    border-radius: 50%;
+    border: 1px solid var(--border-strong);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 500;
+    color: var(--text-muted);
+    flex-shrink: 0;
+    background: #fff;
+    transition: all 0.15s;
+    margin-top: 1px;
+  }
+  .option.selected .opt-letter {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+  .opt-text {
+    font-size: 14px;
+    color: var(--text-body);
+    line-height: 1.6;
+    transition: color 0.15s;
+    padding-top: 2px;
+  }
+  .option.selected .opt-text { color: var(--text-primary); }
+
+  /* BOTÕES */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 14px 30px;
+    border-radius: 10px;
+    font-family: var(--sans);
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+    text-decoration: none;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+  }
+  .btn-primary:hover { background: var(--accent-dark); }
+  .btn-primary:active { transform: scale(0.98); }
+  .btn-primary:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    transform: none;
+  }
+  .btn-outline {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent-border);
+  }
+  .btn-outline:hover { background: var(--accent-light); }
+
+  .btn-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .btn-back {
+    font-size: 13px;
+    color: var(--text-muted);
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-family: var(--sans);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 0;
+  }
+  .btn-back:hover { color: var(--text-body); }
+
+  /* TELA RESULTADO */
+  .res-eyebrow {
+    font-size: 10px; font-weight: 500; letter-spacing: 0.22em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 12px;
+  }
+  .res-title {
+    font-family: var(--serif); font-size: 26px; font-weight: 400;
+    color: var(--text-primary); line-height: 1.3; margin-bottom: 24px;
+  }
+  .res-level {
+    background: var(--bg-soft); border: 1px solid var(--border);
+    border-radius: 16px; padding: 24px 28px; margin-bottom: 32px;
+  }
+  .res-level-label {
+    font-size: 11px; font-weight: 500; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px;
+  }
+  .res-level-name {
+    font-family: var(--serif); font-size: 24px; color: var(--accent);
+    margin-bottom: 8px; line-height: 1.25;
+  }
+  .res-level-desc { font-size: 14px; color: var(--text-body); line-height: 1.7; }
+  .res-section-title {
+    font-size: 11px; font-weight: 500; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--text-muted); margin-bottom: 16px;
+  }
+  .pillars { margin-bottom: 36px; }
+  .pillar-row { margin-bottom: 18px; }
+  .pillar-head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 12px; margin-bottom: 8px;
+  }
+  .pillar-name { font-size: 14px; color: var(--text-primary); font-weight: 500; }
+  .pillar-chip {
+    font-size: 11px; font-weight: 500; letter-spacing: 0.06em;
+    padding: 3px 11px; border-radius: 20px; border: 1px solid var(--border-strong);
+    color: var(--text-muted); white-space: nowrap;
+  }
+  .pillar-chip.n-alto { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .pillar-chip.n-moderado { background: var(--accent-light); border-color: var(--accent); color: var(--accent-dark); }
+  .pillar-chip.n-baixo { background: #fff; border-color: var(--accent-border); color: var(--accent); }
+  .pillar-chip.n-critico { background: #fff; border-color: var(--border-strong); color: var(--text-body); }
+  .pillar-track { height: 6px; background: var(--border); border-radius: 6px; overflow: hidden; }
+  .pillar-fill {
+    height: 100%; width: 0; background: var(--accent); border-radius: 6px;
+    transition: width 0.9s cubic-bezier(0.4,0,0.2,1);
+  }
+  .res-focus {
+    padding: 24px 26px; border-left: 2.5px solid var(--accent);
+    background: var(--accent-light); border-radius: 0 14px 14px 0; margin-bottom: 20px;
+  }
+  .res-focus-label {
+    font-size: 11px; font-weight: 500; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 8px;
+  }
+  .res-focus-title {
+    font-family: var(--serif); font-size: 20px; color: var(--text-primary);
+    margin-bottom: 10px; line-height: 1.35;
+  }
+  .res-focus p { font-size: 14px; color: var(--text-body); line-height: 1.75; }
+  .res-focus .res-action { margin-top: 14px; }
+  .res-focus .res-action strong { color: var(--text-primary); font-weight: 500; }
+  .res-strength { font-size: 14px; color: var(--text-body); line-height: 1.75; margin-bottom: 36px; }
+  .res-strength strong { color: var(--text-primary); font-weight: 500; }
+  .res-next {
+    border-top: 1px solid var(--border); padding-top: 32px; text-align: center;
+  }
+  .res-next-title {
+    font-family: var(--serif); font-size: 22px; color: var(--text-primary);
+    margin-bottom: 12px; line-height: 1.35;
+  }
+  .res-next p {
+    font-size: 15px; color: var(--text-body); line-height: 1.75;
+    max-width: 480px; margin: 0 auto 28px;
+  }
+  .btn-cta {
+    width: 100%; justify-content: center; padding: 18px;
+    font-size: 16px; border-radius: 12px; margin-bottom: 14px;
+  }
+  .res-note { font-size: 12px; color: var(--text-hint); text-align: center; }
+
+  /* FOOTER */
+  .card-footer {
+    padding: 18px 48px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--bg-soft);
+  }
+  .footer-brand { font-size: 11px; color: var(--text-hint); letter-spacing: 0.05em; }
+  .footer-info { font-size: 11px; color: var(--text-hint); }
+
+  /* SETA SVG */
+  .arrow-svg { width: 14px; height: 14px; }
+
+  /* SEPARADOR */
+  .section-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 8px 0 32px;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 600px) {
+    body { padding: 20px 16px 60px; }
+    .card-header, .card-body, .card-footer, .progress-section {
+      padding-left: 24px;
+      padding-right: 24px;
+    }
+    .header-title { font-size: 22px; }
+    .question-text { font-size: 18px; }
+    .res-level { padding: 20px; }
+    .res-title { font-size: 22px; }
+  }
+
+  /* ANIMATION */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .screen.active { animation: fadeIn 0.3s ease; }
+</style>
+</head>
+<body>
+
+<div class="logo-bar">
+  <span class="logo-text">Corpo-Casa Club</span>
+  <span class="logo-dot"></span>
+  <span class="logo-text">Método CORE</span>
+</div>
+
+<div class="card">
+
+  <!-- HEADER -->
+  <div class="card-header">
+    <div class="header-eyebrow">Diagnóstico de Performance</div>
+    <div class="header-title">Raio-X CORE</div>
+    <div class="header-subtitle">Análise individual em 5 dimensões da performance clínica</div>
+  </div>
+
+  <!-- PROGRESS (hidden na abertura) -->
+  <div class="progress-section" id="progress-section" style="display:none;">
+    <div class="progress-row">
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+      <span class="progress-label" id="progress-label">Pergunta 1 de 24</span>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div class="card-body">
+
+    <!-- TELA 0: ABERTURA -->
+    <div class="screen active" id="screen-opening">
+      <p class="opening-text">
+        Este diagnóstico foi criado para te dar uma leitura honesta de como você está operando —
+        <strong>não como você gostaria de estar</strong>, mas como você realmente está nas últimas duas semanas.<br><br>
+        São 24 perguntas divididas em 5 dimensões da performance clínica. Leva em torno de 15 minutos.
+      </p>
+      <div class="instr-block">
+        <p>Escolha a opção que mais representa seu comportamento <strong>real</strong>, não o ideal. Não há resposta certa ou errada — quanto mais honesta a resposta, mais preciso o diagnóstico.</p>
+      </div>
+      <button class="btn btn-primary" onclick="goToData()">
+        Começar
+        <svg class="arrow-svg" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+
+    <!-- TELA 1: DADOS -->
+    <div class="screen" id="screen-data">
+      <div class="pilar-badge"><span class="pilar-dot"></span>Identificação</div>
+      <div class="question-text">Antes de começar, preciso de algumas informações para registrar o seu resultado.</div>
+      <div class="fields">
+        <div class="field-group">
+          <label class="field-label">Nome completo *</label>
+          <input class="field-input" type="text" id="field-nome" placeholder="Dra. Seu Nome">
+        </div>
+        <div class="field-group">
+          <label class="field-label">E-mail *</label>
+          <input class="field-input" type="email" id="field-email" placeholder="seu@email.com.br">
+        </div>
+        <div class="field-group">
+          <label class="field-label">WhatsApp (com DDD) *</label>
+          <input class="field-input" type="tel" id="field-tel" placeholder="(44) 99999-9999">
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-back" onclick="goTo('opening')">
+          ← Voltar
+        </button>
+        <button class="btn btn-primary" onclick="startQuiz()">
+          Iniciar questionário
+          <svg class="arrow-svg" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- TELA 2: QUIZ -->
+    <div class="screen" id="screen-quiz">
+      <div class="pilar-badge" id="q-pilar"><span class="pilar-dot"></span><span id="pilar-text">C — Cognição Executiva</span></div>
+      <div class="question-text" id="q-text"></div>
+      <div class="options" id="q-options"></div>
+      <div class="btn-row">
+        <button class="btn-back" onclick="prevQuestion()">← Anterior</button>
+        <button class="btn btn-primary" id="btn-next" onclick="nextQuestion()" disabled>
+          Próxima
+          <svg class="arrow-svg" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- TELA 3: RESULTADO -->
+    <div class="screen" id="screen-result">
+      <div class="res-eyebrow">Seu resultado</div>
+      <div class="res-title" id="res-title">Seu perfil CORE</div>
+
+      <div class="res-level">
+        <div class="res-level-label">Leitura geral</div>
+        <div class="res-level-name" id="res-level-name"></div>
+        <div class="res-level-desc" id="res-level-desc"></div>
+      </div>
+
+      <div class="res-section-title">Seus 5 pilares</div>
+      <div class="pillars" id="res-pillars"></div>
+
+      <div class="res-focus">
+        <div class="res-focus-label">Seu ponto de partida</div>
+        <div class="res-focus-title" id="res-focus-title"></div>
+        <p id="res-focus-text"></p>
+        <p class="res-action" id="res-focus-action"></p>
+      </div>
+
+      <p class="res-strength" id="res-strength"></p>
+
+      <div class="res-next">
+        <div class="res-next-title">O que este resultado ainda não mostra</div>
+        <p>Este é um resumo. Ele aponta onde o padrão aparece, mas não explica por que ele se repete no seu caso, nem como desmontá-lo sem depender de motivação. Isso é o que trabalhamos no Método CORE: 8 semanas, individual e online, com estrutura para cada pilar.</p>
+        <a href="#" id="btn-cta" class="btn btn-primary btn-cta" target="_blank" rel="noopener">
+          Quero aprofundar meu resultado
+          <svg class="arrow-svg" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <p class="res-note">Uma conversa pelo WhatsApp, sem compromisso.</p>
+      </div>
+    </div>
+
+  </div><!-- /card-body -->
+
+  <div class="card-footer">
+    <span class="footer-brand">Corpo-Casa Club · Método CORE</span>
+    <span class="footer-info">Suas respostas são confidenciais</span>
+  </div>
+
+</div><!-- /card -->
+
+<script>
+const QUESTIONS = [
+  {
+    pilar: "C — Cognição Executiva",
+    text: "Quando você chega ao consultório de manhã, como você organiza suas prioridades do dia?",
+    options: [
+      "Não organizo — respondo ao que aparece primeiro",
+      "Tento organizar mentalmente, mas frequentemente mudo de plano",
+      "Tenho uma lista ou rotina, mas nem sempre sigo",
+      "Tenho um protocolo claro e consigo seguir na maior parte dos dias"
+    ]
+  },
+  {
+    pilar: "C — Cognição Executiva",
+    text: "Como você se sente ao tomar decisões de gestão (precificação, contratação, marketing) depois de um dia longo de atendimentos?",
+    options: [
+      "Evito completamente — adio para outro momento que nunca chega",
+      "Tomo decisões, mas depois me arrependo ou questiono muito",
+      "Consigo, mas com esforço significativo e pouca confiança",
+      "Tenho energia e clareza mesmo após atendimentos"
+    ]
+  },
+  {
+    pilar: "C — Cognição Executiva",
+    text: "Com que frequência você percebe que está procrastinando tarefas importantes de gestão do consultório?",
+    options: [
+      "Sempre — tenho uma lista crescente de \"quando eu tiver tempo\"",
+      "Com frequência — adio mais do que executo",
+      "Às vezes — consigo executar depois de algum tempo",
+      "Raramente — executo a maior parte no prazo"
+    ]
+  },
+  {
+    pilar: "C — Cognição Executiva",
+    text: "Quando você define uma meta para o consultório (financeira, de pacientes, de procedimento), o que normalmente acontece?",
+    options: [
+      "Defino, mas não acompanho e acabo esquecendo",
+      "Começo bem, mas perco o ritmo em 2–3 semanas",
+      "Acompanho de forma irregular — às vezes vai, às vezes não",
+      "Tenho rotina de acompanhamento e ajusto quando necessário"
+    ]
+  },
+  {
+    pilar: "C — Cognição Executiva",
+    text: "Como você lida com interrupções inesperadas (paciente que cancela, problema no consultório) em relação ao seu plano do dia?",
+    options: [
+      "Desorganizo completamente — o dia vai por água abaixo",
+      "Fico ansiosa e levo tempo para recuperar o foco",
+      "Me adapto, mas sinto que perdi produtividade significativa",
+      "Consigo retomar sem grande impacto no resto do dia"
+    ]
+  },
+  {
+    pilar: "O — Organização do Ambiente",
+    text: "Como você descreveria o estado do seu consultório no dia a dia (mesa, materiais, organização geral)?",
+    options: [
+      "Desorganizado — passo tempo procurando coisas com frequência",
+      "Razoável, mas há áreas que me causam fricção ou estresse",
+      "Organizado na maior parte, com alguns pontos de melhoria",
+      "Bem organizado — o ambiente favorece meu foco e ritmo"
+    ]
+  },
+  {
+    pilar: "O — Organização do Ambiente",
+    text: "Como você lida com notificações (WhatsApp, Instagram, e-mail) durante seus horários de trabalho ou estudo?",
+    options: [
+      "Verifico constantemente — interrupções são frequentes e automáticas",
+      "Verifico muito, mas sei que atrapalha — não consigo parar",
+      "Tenho alguns momentos sem notificação, mas não é consistente",
+      "Tenho rotina clara de quando verifico — raramente interrompo o foco"
+    ]
+  },
+  {
+    pilar: "O — Organização do Ambiente",
+    text: "Sua agenda de atendimentos reflete o que você quer ou o que os pacientes pedem?",
+    options: [
+      "Os pacientes ditam — aceito encaixes e mudanças com frequência",
+      "Tenho estrutura, mas cedo com frequência a pedidos externos",
+      "Controlo razoavelmente bem, com exceções pontuais",
+      "Tenho blocos definidos e protejo minha agenda ativamente"
+    ]
+  },
+  {
+    pilar: "O — Organização do Ambiente",
+    text: "Como está o seu espaço de trabalho em casa (onde você estuda, planeja ou cuida da gestão)?",
+    options: [
+      "Não tenho espaço definido — trabalho de onde der",
+      "Tenho um lugar, mas é frequentemente interrompido ou desconfortável",
+      "Tenho espaço razoável, mas não é ideal para foco",
+      "Tenho ambiente dedicado que favorece concentração"
+    ]
+  },
+  {
+    pilar: "O — Organização do Ambiente",
+    text: "Ao final de uma semana intensa, como está fisicamente o seu espaço de trabalho?",
+    options: [
+      "Caótico — deixo para organizar \"quando tiver tempo\"",
+      "Bagunçado, mas funcional — me acostumei com o estado",
+      "Razoável — faço uma limpeza rápida, mas sem ritual consistente",
+      "Mantenho padrão — reorganizar faz parte da minha rotina semanal"
+    ]
+  },
+  {
+    pilar: "R — Regulação do Estado",
+    text: "Como você classificaria a qualidade do seu sono nas últimas 2 semanas?",
+    options: [
+      "Muito ruim — acordo cansada frequentemente, sono irregular",
+      "Irregular — algumas noites boas, muitas ruins",
+      "Razoável — durmo o suficiente, mas não me sinto totalmente descansada",
+      "Bom — acordo com energia na maioria dos dias"
+    ]
+  },
+  {
+    pilar: "R — Regulação do Estado",
+    text: "Como está seu nível de energia ao longo de um dia típico de atendimentos?",
+    options: [
+      "Esgotada já na parte da tarde — opero no limite",
+      "Queda significativa após o almoço, difícil retomar",
+      "Razoável, mas sinto que poderia render muito mais",
+      "Energia estável ao longo do dia na maior parte da semana"
+    ]
+  },
+  {
+    pilar: "R — Regulação do Estado",
+    text: "Como você se alimenta em dias de muitos atendimentos?",
+    options: [
+      "Pulo refeições ou como qualquer coisa entre um paciente e outro",
+      "Refeições irregulares — depende do quanto atarefada estou",
+      "Me alimento, mas sem atenção à qualidade ou horário",
+      "Tenho rotina de alimentação mesmo em dias intensos"
+    ]
+  },
+  {
+    pilar: "R — Regulação do Estado",
+    text: "Como você descreveria seu estado emocional no início de uma semana de trabalho?",
+    options: [
+      "Ansiosa ou com dread — já começo a semana sobrecarregada",
+      "Neutro a negativo — o trabalho não me energiza mais",
+      "Ok — nem animada nem sobrecarregada",
+      "Relativamente positiva — consigo encontrar significado no trabalho"
+    ]
+  },
+  {
+    pilar: "R — Regulação do Estado",
+    text: "Com que frequência você tem momentos de recuperação real durante a semana (sem trabalho, sem tela, sem obrigação)?",
+    options: [
+      "Quase nunca — estou sempre em modo de produção ou culpa",
+      "Raramente e com culpa — não consigo desligar completamente",
+      "Às vezes — mais nos fins de semana, mas nem sempre",
+      "Com frequência — tenho rituais de recuperação que protejo"
+    ]
+  },
+  {
+    pilar: "E — Execução Estruturada",
+    text: "Quantas vezes por mês você começa algo importante para o consultório, mas não conclui?",
+    options: [
+      "Muitas vezes — tenho vários começos sem fim",
+      "Com frequência — mais inícios do que conclusões",
+      "Às vezes — concluo a maioria, mas alguns ficam parados",
+      "Raramente — o que começo, termino"
+    ]
+  },
+  {
+    pilar: "E — Execução Estruturada",
+    text: "Como você descreveria sua relação com hábitos e rotinas?",
+    options: [
+      "Não tenho rotinas estabelecidas — cada dia é diferente",
+      "Tento criar rotinas, mas elas duram poucos dias",
+      "Tenho algumas rotinas, mas não são consistentes",
+      "Tenho rotinas claras que funcionam na maior parte da semana"
+    ]
+  },
+  {
+    pilar: "E — Execução Estruturada",
+    text: "Quando você define uma mudança que quer fazer, o que normalmente acontece depois de 30 dias?",
+    options: [
+      "Voltei completamente para como era antes",
+      "Fiz por alguns dias, mas não sustentei",
+      "Parcialmente implementado — ainda instável",
+      "A mudança está incorporada ou claramente em andamento"
+    ]
+  },
+  {
+    pilar: "E — Execução Estruturada",
+    text: "Como você reage quando não consegue cumprir um compromisso que assumiu consigo mesma?",
+    options: [
+      "Autocrítica severa — me julgo muito e acabo abandonando",
+      "Desânimo forte — leva tempo para retomar",
+      "Frustração moderada — retomo, mas sem entender o que falhou",
+      "Analiso o que falhou e ajusto sem drama"
+    ]
+  },
+  {
+    pilar: "E — Execução Estruturada",
+    text: "Se você olhar para os últimos 3 meses, qual frase descreve melhor sua execução?",
+    options: [
+      "Sabendo muito, executando pouco",
+      "Executando em surtos — intenso por um tempo, depois estagnado",
+      "Progresso real, mas irregular — poderia ser muito mais",
+      "Progresso consistente, mesmo que lento"
+    ]
+  },
+  {
+    pilar: "I — Identidade e Valor",
+    text: "Como você se sente ao passar o valor de um tratamento de alto ticket para um paciente?",
+    options: [
+      "Insegura — sinto que preciso dar desconto para ele fechar",
+      "Desconfortável — passo o valor rápido e mudo de assunto",
+      "Tranquila, mas se o paciente questiona, eu titubeio",
+      "Confiante — sei que meu preço reflete a entrega e o valor gerado"
+    ]
+  },
+  {
+    pilar: "I — Identidade e Valor",
+    text: "Quando você pensa na sua carreira daqui a 2 anos, como você se enxerga?",
+    options: [
+      "Não consigo pensar no futuro — estou apenas tentando sobreviver ao mês",
+      "Tenho desejos, mas sinto que são inalcançáveis para mim",
+      "Tenho uma ideia geral, mas não tenho um plano para chegar lá",
+      "Tenho clareza da profissional que estou me tornando e ajo de acordo"
+    ]
+  },
+  {
+    pilar: "I — Identidade e Valor",
+    text: "Como você se posiciona nas redes sociais ou em eventos profissionais?",
+    options: [
+      "Me escondo — não posto ou não falo sobre meu trabalho por vergonha",
+      "Posto apenas a parte técnica, sem mostrar minha autoridade ou visão",
+      "Posto com frequência, mas sinto que não transmito o valor real do meu trabalho",
+      "Me posiciono como autoridade e ocupo meu espaço com confiança"
+    ]
+  },
+  {
+    pilar: "I — Identidade e Valor",
+    text: "O seu consultório físico hoje representa o nível técnico do trabalho que você entrega?",
+    options: [
+      "Não — sinto vergonha de alguns pontos do meu espaço",
+      "Mais ou menos — é funcional, mas não comunica minha excelência",
+      "Sim, na maior parte, mas faltam detalhes de diferenciação",
+      "Totalmente — o ambiente é uma extensão da minha autoridade"
+    ]
+  }
+];
+
+let currentQ = 0;
+let answers = new Array(QUESTIONS.length).fill(null);
+let userData = {};
+
+function goToData() {
+  goTo('data');
+}
+
+function goTo(screenId) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + screenId).classList.add('active');
+
+  const showProgress = screenId === 'quiz';
+  document.getElementById('progress-section').style.display = showProgress ? 'block' : 'none';
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function startQuiz() {
+  const nome = document.getElementById('field-nome').value.trim();
+  const email = document.getElementById('field-email').value.trim();
+  const tel = document.getElementById('field-tel').value.trim();
+
+  if (!nome || !email || !tel) {
+    alert('Por favor, preencha todos os campos para continuar.');
+    return;
+  }
+
+  userData = { nome, email, tel };
+  currentQ = 0;
+  renderQuestion();
+  goTo('quiz');
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[currentQ];
+  document.getElementById('pilar-text').textContent = q.pilar;
+  document.getElementById('q-text').textContent = q.text;
+
+  const opts = document.getElementById('q-options');
+  opts.innerHTML = '';
+  const letters = ['A', 'B', 'C', 'D'];
+
+  q.options.forEach((opt, i) => {
+    const div = document.createElement('div');
+    div.className = 'option' + (answers[currentQ] === i ? ' selected' : '');
+    div.onclick = () => selectOption(i);
+    div.innerHTML = `
+      <div class="opt-letter">${letters[i]}</div>
+      <div class="opt-text">${opt}</div>
+    `;
+    opts.appendChild(div);
+  });
+
+  const btn = document.getElementById('btn-next');
+  btn.disabled = answers[currentQ] === null;
+  btn.textContent = currentQ === QUESTIONS.length - 1 ? 'Ver resultado' : 'Próxima';
+  if (currentQ < QUESTIONS.length - 1) {
+    btn.innerHTML = 'Próxima <svg class="arrow-svg" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  } else {
+    btn.innerHTML = 'Ver resultado <svg class="arrow-svg" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  }
+  btn.disabled = answers[currentQ] === null;
+
+  updateProgress();
+}
+
+function selectOption(i) {
+  answers[currentQ] = i;
+  document.querySelectorAll('.option').forEach((el, idx) => {
+    el.classList.toggle('selected', idx === i);
+  });
+  document.getElementById('btn-next').disabled = false;
+}
+
+function nextQuestion() {
+  if (answers[currentQ] === null) return;
+
+  if (currentQ < QUESTIONS.length - 1) {
+    currentQ++;
+    renderQuestion();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } else {
+    finishQuiz();
+  }
+}
+
+function prevQuestion() {
+  if (currentQ > 0) {
+    currentQ--;
+    renderQuestion();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } else {
+    goTo('data');
+    document.getElementById('progress-section').style.display = 'none';
+  }
+}
+
+function updateProgress() {
+  const pct = Math.round(((currentQ) / QUESTIONS.length) * 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-label').textContent = `Pergunta ${currentQ + 1} de ${QUESTIONS.length}`;
+}
+
+// ------------------------------------------------------------
+// CONFIGURAÇÃO: coloque aqui o número de WhatsApp que recebe as conversas,
+// com 55 + DDD + número, só dígitos (ex.: 5544999999999)
+// ------------------------------------------------------------
+const WHATSAPP_NUMERO = '5544991146612';
+const FORMSPREE_URL = 'https://formspree.io/f/xnjykzbn';
+// Cole aqui a URL do Apps Script (termina em /exec) para gravar as respostas no Google Sheets
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxoIUEeOXC5nIeBn13VBkVV-WUvRGj9WtRGwinbgjGXDU7j1iow1xDgc071fNNP9YxN-Q/exec';
+
+const PILARES = {
+  C: {
+    nome: 'Cognição Executiva',
+    gargalo: 'As suas decisões de gestão acontecem quando sobra energia, e depois de um dia de atendimentos quase nunca sobra. O resultado é uma fila de decisões adiadas que cresce em silêncio.',
+    acao: 'Reserve 30 minutos no início de um dia da semana, antes do primeiro paciente, para uma única decisão de gestão. Sem celular antes.'
+  },
+  O: {
+    nome: 'Organização do Ambiente',
+    gargalo: 'O seu ambiente, físico e digital, cobra esforço de você o tempo todo: notificações, agenda aberta a encaixes, espaço de trabalho que interrompe. Você compensa com disciplina o que o ambiente deveria resolver sozinho.',
+    acao: 'Ative o modo não perturbe nos horários de atendimento e em um bloco de 60 minutos para gestão. Mantenha por 5 dias e observe o que muda no seu foco.'
+  },
+  R: {
+    nome: 'Regulação do Estado',
+    gargalo: 'Sono, energia e recuperação estão oscilando, e isso reduz a sua capacidade de decidir e executar, principalmente no fim do dia.',
+    acao: 'Escolha um único ponto para ajustar: horário de dormir, uma refeição no meio do dia de atendimento ou uma pausa real de 10 minutos. Mantenha por 7 dias.'
+  },
+  E: {
+    nome: 'Execução Estruturada',
+    gargalo: 'Você começa com intenção, mas a mudança perde sustentação antes de virar rotina. Falta um sistema de revisão e de retomada para quando o ritmo cai.',
+    acao: 'Escolha uma única mudança para os próximos 21 dias, defina como vai saber que ela aconteceu e revise por 5 minutos toda segunda-feira.'
+  },
+  I: {
+    nome: 'Identidade e Valor',
+    gargalo: 'A forma como você se enxerga e se posiciona como profissional está limitando preço, visibilidade e as decisões que você toma sobre o consultório.',
+    acao: 'Escreva em três linhas a profissional que você quer ser daqui a 2 anos e escolha uma atitude desta semana que ela tomaria, como passar um valor sem desconto antecipado.'
+  }
+};
+
+const ORDEM = ['C', 'O', 'R', 'E', 'I'];
+
+function nivelPilar(pct) {
+  if (pct >= 0.85) return { id: 'alto', nome: 'Alto' };
+  if (pct >= 0.65) return { id: 'moderado', nome: 'Moderado' };
+  if (pct >= 0.45) return { id: 'baixo', nome: 'Baixo' };
+  return { id: 'critico', nome: 'Crítico' };
+}
+
+function nivelGeral(pct) {
+  if (pct >= 0.80) return { nome: 'Execução consolidada', desc: 'Os seus pilares sustentam bem a sua execução. O trabalho agora é refinar o que já funciona e proteger isso nos períodos de maior carga.' };
+  if (pct >= 0.60) return { nome: 'Zona de transição', desc: 'Você funciona bem, mas ainda depende de esforço pessoal para sustentar o resultado. A estrutura ao seu redor ainda não segura sozinha.' };
+  if (pct >= 0.40) return { nome: 'Zona de atrito', desc: 'Existem pontos de atrito em mais de um pilar e eles se somam. A energia vai para segurar o dia, e sobra pouco para construir.' };
+  return { nome: 'Zona crítica', desc: 'Vários pilares estão comprometidos ao mesmo tempo. Vale tratar isso como prioridade, com estrutura e acompanhamento.' };
+}
+
+function computeResult(ans) {
+  const acc = {};
+  ORDEM.forEach(k => { acc[k] = { score: 0, max: 0 }; });
+  QUESTIONS.forEach((q, i) => {
+    const k = q.pilar.charAt(0);
+    acc[k].max += 4;
+    if (ans[i] !== null && ans[i] !== undefined) acc[k].score += ans[i] + 1;
+  });
+  const pilares = ORDEM.map(k => {
+    const pct = acc[k].score / acc[k].max;
+    return { key: k, nome: PILARES[k].nome, score: acc[k].score, max: acc[k].max, pct: pct, nivel: nivelPilar(pct) };
+  });
+  const total = pilares.reduce((s, p) => s + p.score, 0);
+  const totalMax = pilares.reduce((s, p) => s + p.max, 0);
+  let prioritario = pilares[0];
+  let forte = pilares[0];
+  pilares.forEach(p => {
+    if (p.pct < prioritario.pct) prioritario = p;
+    if (p.pct > forte.pct) forte = p;
+  });
+  return { pilares, total, totalMax, geral: nivelGeral(total / totalMax), prioritario, forte };
+}
+
+function renderResult(r) {
+  const primeiroNome = (userData.nome || '').replace(/^(dra?\.?)\s+/i, '').split(' ')[0];
+  document.getElementById('res-title').textContent = primeiroNome
+    ? primeiroNome + ', este é o seu perfil CORE'
+    : 'Este é o seu perfil CORE';
+  document.getElementById('res-level-name').textContent = r.geral.nome;
+  document.getElementById('res-level-desc').textContent = r.geral.desc;
+
+  const wrap = document.getElementById('res-pillars');
+  wrap.innerHTML = '';
+  r.pilares.forEach(p => {
+    const row = document.createElement('div');
+    row.className = 'pillar-row';
+    row.innerHTML =
+      '<div class="pillar-head"><span class="pillar-name">' + p.key + ' · ' + p.nome + '</span>' +
+      '<span class="pillar-chip n-' + p.nivel.id + '">' + p.nivel.nome + '</span></div>' +
+      '<div class="pillar-track"><div class="pillar-fill" data-pct="' + Math.round(p.pct * 100) + '"></div></div>';
+    wrap.appendChild(row);
+  });
+  requestAnimationFrame(function() {
+    setTimeout(function() {
+      document.querySelectorAll('.pillar-fill').forEach(function(el) {
+        el.style.width = el.getAttribute('data-pct') + '%';
+      });
+    }, 150);
+  });
+
+  const pr = r.prioritario;
+  document.getElementById('res-focus-title').textContent = pr.key + ' · ' + pr.nome;
+  document.getElementById('res-focus-text').textContent = PILARES[pr.key].gargalo;
+  document.getElementById('res-focus-action').innerHTML = '<strong>Para começar esta semana:</strong> ' + PILARES[pr.key].acao;
+
+  const st = document.getElementById('res-strength');
+  if (r.forte.key !== pr.key) {
+    st.innerHTML = 'O pilar mais forte hoje é <strong>' + r.forte.nome + '</strong>. Ele é a base que sustenta as mudanças nos outros.';
+  } else {
+    st.textContent = '';
+  }
+
+  const msg = 'Oi, Ana! Fiz o Raio-X CORE. Meu resultado: ' + r.geral.nome + ', com ponto de partida em ' + pr.nome + '. Quero entender como aprofundar.';
+  document.getElementById('btn-cta').href = 'https://wa.me/' + WHATSAPP_NUMERO + '?text=' + encodeURIComponent(msg);
+}
+
+function finishQuiz() {
+  const r = computeResult(answers);
+  sendLead(r);
+  renderResult(r);
+  goTo('result');
+  document.getElementById('progress-section').style.display = 'none';
+}
+
+function sendLead(r) {
+  const letters = ['A', 'B', 'C', 'D'];
+  let respostas = '';
+  QUESTIONS.forEach(function(q, i) {
+    const a = answers[i];
+    respostas += 'Q' + (i + 1) + ' [' + q.pilar + '] ' + q.text + ' | Resposta: ' +
+      (a !== null ? letters[a] + ') ' + q.options[a] : '-') + ' | Pontos: ' + (a !== null ? a + 1 : 0) + '\n';
+  });
+  const payload = {
+    _subject: 'Raio-X CORE - ' + userData.nome + ' - ' + new Date().toLocaleDateString('pt-BR'),
+    nome: userData.nome,
+    email: userData.email,
+    whatsapp: userData.tel,
+    data: new Date().toLocaleDateString('pt-BR'),
+    nivel_geral: r.geral.nome,
+    pilar_prioritario: r.prioritario.key + ' - ' + r.prioritario.nome,
+    total: r.total + '/' + r.totalMax,
+    respostas: respostas
+  };
+  r.pilares.forEach(function(p) {
+    payload[p.key + '_' + p.nome.replace(/\s+/g, '_')] = p.score + '/' + p.max + ' (' + p.nivel.nome + ')';
+  });
+  if (SHEETS_URL) {
+    const linha = {
+      data: new Date().toLocaleDateString('pt-BR'),
+      nome: userData.nome,
+      email: userData.email,
+      whatsapp: userData.tel,
+      nivel_geral: r.geral.nome,
+      pilar_prioritario: r.prioritario.nome,
+      total: r.total + '/' + r.totalMax,
+      pilares: r.pilares.map(function(p) { return p.score + '/' + p.max + ' ' + p.nivel.nome; }),
+      letras: QUESTIONS.map(function(q, i) { return answers[i] !== null ? letters[answers[i]] : ''; })
+    };
+    fetch(SHEETS_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(linha)
+    }).catch(function() { console.log('Envio para planilha falhou'); });
+  }
+  fetch(FORMSPREE_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    body: JSON.stringify(payload)
+  }).catch(function() { console.log('Envio falhou'); });
+}
+</script>
+</body>
+</html>
